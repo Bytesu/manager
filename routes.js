@@ -14,9 +14,9 @@ var isLogined = require('./mods/auth/logined');
 
 
 module.exports = function (app) {
-    app.use(authCheck);
+    //app.use(authCheck);
     app.use(curl);
-    app.use(isLogined);
+    //app.use(isLogined);
 
     app.get('/', function (req, res, next) {
         res.render('index');

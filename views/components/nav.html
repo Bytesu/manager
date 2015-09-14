@@ -1,0 +1,91 @@
+<style>
+    .navbar-inverse {
+        background-image: linear-gradient(to bottom, #00b38a 0, #00b38a 100%);
+        background-repeat: repeat-x;
+    }
+
+    .navbar-inverse .navbar-nav > li > a {
+        color: #96efdf;;
+    }
+
+    .navbar-inverse {
+        background-color: #00b38a;
+    }
+
+    .navbar-inverse .navbar-brand {
+        color: #fff;
+    }
+
+    .navbar-inverse {
+        border-color: #00b38a;
+    }
+
+    .container {
+
+    }
+
+    .btn {
+        background-image: none;
+    }
+
+    .btn-danger, .btn-default, .btn-info, .btn-primary, .btn-success, .btn-warning {
+        -webkit-box-shadow: none;
+        box-shadow: none;
+    }
+    .navbar-inverse .navbar-toggle {
+        border-color: #FFF;
+    }
+    .navbar-inverse .navbar-toggle:focus, .navbar-inverse .navbar-toggle:hover {
+        background-color: #36DEC0;
+    }
+    .navbar-inverse .navbar-collapse, .navbar-inverse .navbar-form {
+        border-color: #0db374;
+    }
+    .margin-top-10{
+        margin-top: 10px;;
+    }
+    .navbar-inner {
+        padding-left: 20px;
+        padding-right: 20px;
+        background-color: #222;
+        background-repeat: repeat-x;
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#333333', endColorstr='#222222', GradientType=0);
+        -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25),inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+        -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25),inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25),inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+    }
+</style>
+<div class="navbar navbar-inverse navbar-fixed-top navbar-inner">
+    <div class="container">
+        <div class="navbar-header">
+            <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand hidden-sm" href="/"><i class="fa fa-home"></i> 管理后台</a>
+        </div>
+        <div class="navbar-collapse collapse" role="navigation">
+            <ul class="nav navbar-nav">
+                <li class=""><a href="/#"><i class="fa fa-cog"></i> 管理</a></li>
+                <!--<li class="hidden-sm hidden-md"><a href="/teacher_manager">老师管理</a></li>-->
+                <li><a href="/order"><i class="fa fa-jpy"></i> 订单管理</a></li>
+                <li><a href="/#"><i class="fa fa-commenting-o"></i> 通知消息</a></li>
+                <li><a href="/stat"><i class="fa fa-area-chart"></i> 订单统计</a></li>
+                <li class="dropdown " index="demo">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-cubes"></i> 前端组件&nbsp;<b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/components"><i class="fa fa-cubes"></i> 组件库</a></li>
+                    </ul>
+                </li>
+
+            </ul>
+            <ul class="nav navbar-nav navbar-right hidden-sm">
+                <li>
+                    <a href="/loginout"><i class="fa fa-sign-out"></i> 退出</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

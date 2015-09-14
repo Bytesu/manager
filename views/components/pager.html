@@ -1,0 +1,126 @@
+<div class="bs-example" data-example-id="simple-pagination">
+    <nav>
+        <ul class="pagination">
+            <li class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">«</span></a></li>
+            <li><a href="#">1</a></li>
+            <li><a href="#">2</a></li>
+            <li><a href="#">3</a></li>
+            <li><a href="#">4</a></li>
+            <li><a href="#">5</a></li>
+            <li><a href="#" aria-label="Next"><span aria-hidden="true">»</span></a></li>
+        </ul>
+    </nav>
+</div>
+<div class="bs-example" data-example-id="simple-pagination">
+
+    <nav id="pagerSimple1">
+
+    </nav>
+</div>
+<nav>
+    <ul class="pager">
+        <li class="previous"><a href="#"><span aria-hidden="true">&larr;</span> Older</a></li>
+        <li class="next"><a href="#">Newer <span aria-hidden="true">&rarr;</span></a></li>
+    </ul>
+</nav>
+<script>
+
+    'use strict';
+    (function ($) {
+        $.fn.extend({
+            /**
+             * 分页
+             * @param opt
+             * @param cb
+             * @returns {*}
+             */
+            pager: function (opt) {
+                var default_ = {
+                    total: 30,
+                    current: 1,//从1开始
+                    click: function () {//每一页的点击事件
+                        alert('当前页被点了！');
+                    }
+                };
+                default_ = $.extend({}, default_, opt || {});
+                var Pager = function (val, this_) {
+
+                    this.$ele = $(this_);
+                    this.pageItem = '<li><a href="#">1</a></li>';
+                    this.prevItem = '<li><a href="#" aria-label="Previous"><span aria-hidden="true">«</span></a></li>';
+                    this.nextItem = '<li><a href="#" aria-label="Next"><span aria-hidden="true">»</span></a></li>';
+                    this.init();
+                };
+                Pager.prototype.click = function () {
+//                    alert();
+                    this.clickEvent($(this).find('a').html())
+                };
+                Pager.prototype.clickEvent = function (next) {
+//                    alert($(this).find('a').html());
+                    alert(next);
+                };
+                Pager.prototype.init = function () {
+                    var that = this;
+                    var $ul = $('<ul>').addClass('pagination');
+                    if(default_.current==1){
+                        that.prevItem = $(that.prevItem).addClass('disabled');
+                    }
+                    $ul.append($(that.prevItem).click(function(){
+                        var pagePrev = (default_.current-1);
+                        if(pagePrev>0){
+                            that.clickEvent(pagePrev);
+                        }
+                    }));
+                    if(default_.current==default_.total)that.$ele.find("a[aria-label='Next']").closest('li').addClass('disabled');
+                    default_.prev = default_.current - 2;
+                    default_.next = default_.current + 2;
+//                    if (default_.current > 7) {
+//                        $ul.append($(that.nextItem).find('a').html(1).parent('li'));
+//                        $ul.append($(that.nextItem).find('a').html('...').parent('li'));
+//                    }
+                    if (default_.prev < 1) {
+                        default_.next += 2;
+                        default_.prev = 1;
+                    }
+                    if (default_.next > default_.total) {
+                        default_.prev -= (default_.next - default_.total);
+                        default_.next = default_.total;
+                    }
+                    for (var i = default_.prev; i <= default_.next; i++) {
+                        if (default_.current != i) {
+                            $ul.append($(that.nextItem).find('a').html(i).parent('li').click(that.click));
+                        } else {
+                            $ul.append($(that.nextItem).addClass('active').find('a').html(i).parent('li').click(that.click));
+                        }
+                    }
+                    if (default_.current > 7) {
+                    }
+//                    if (default_.total-default_.next > 0) {
+//                        $ul.append($(that.nextItem).find('a').html('...').parent('li'));
+//                        $ul.append($(that.nextItem).find('a').html(default_.total).parent('li'));
+//                    }
+
+                    if(default_.current==default_.total){
+                        that.nextItem = $(that.nextItem).addClass('disabled');
+                    }
+                    $ul.append($(that.nextItem).click(function(){
+                        var pageNext = (default_.current+1);
+                        if(pageNext<=default_.total){
+                            that.clickEvent(pageNext);
+                        }
+                    }));
+//                    $ul.append(that.nextItem);
+                    $ul.appendTo(that.$ele);
+                };
+                return this.each(function (idx, val) {
+                    new Pager(val, this);
+                });
+            }
+        });
+    })(jQuery);
+
+    $(function () {
+        // example
+        $('#pagerSimple1').pager({current: 29});
+    });
+</script>
