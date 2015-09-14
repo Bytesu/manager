@@ -1,0 +1,26 @@
+{
+  "name": "manager",
+  "version": "0.0.0",
+  "homepage": "https://github.com/Bytesu/manager",
+  "authors": [
+    "suweiming <byte_su@163.com>"
+  ],
+  "description": "manager",
+  "keywords": [
+    "manager"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~3.3.5",
+    "jquery": "~2.1.4",
+    "moment": "~2.10.6",
+    "underscore": "~1.8.3"
+  }
+}
