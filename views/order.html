@@ -1,0 +1,352 @@
+<style>
+    .container {
+        /*width: 100%;*/
+        /*padding: 0;margin: 0;*/
+    }
+</style><br/>
+<style>
+    .button {
+        border: 1px solid #bbb;
+        border-radius: 1px;
+        box-shadow: 0 1px 0 1px rgba(0,0,0,.04);
+        width: 300px;
+        background: #f3f3f3;
+        background: -moz-linear-gradient(top, #ffffff 0%, #e5e5e5 100%);
+        background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,#e5e5e5));
+        background: -webkit-linear-gradient(top, #ffffff 0%,#e5e5e5 100%);
+        background: -o-linear-gradient(top, #ffffff 0%,#e5e5e5 100%);
+        background: -ms-linear-gradient(top, #ffffff 0%,#e5e5e5 100%);
+        background: linear-gradient(to bottom, #ffffff 0%,#e5e5e5 100%);
+    }
+    /* --------------  */
+    /*  custom-select  */
+    /* --------------  */
+    .custom-select {
+        position: relative;
+    }
+    .custom-select select {
+        width:100%;
+        margin:0;
+        background:none;
+        border: 1px solid transparent;
+        outline: none;
+        /* Prefixed box-sizing rules necessary for older browsers */
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+        /* Remove select styling */
+        appearance: none;
+        -webkit-appearance: none;
+        /* Font size must the 16px or larger to prevent iOS page zoom on focus */
+        /* General select styles: change as needed */
+        font-family: helvetica, sans-serif;
+        font-weight: bold;
+        color: #444;
+        padding: .6em 1.9em .5em .8em;
+        line-height:1.3;
+    }
+    .custom-select::after {
+        content: "";
+        position: absolute;
+        width: 0px;
+        height: 0px;
+        top: 50%;
+        right: 8px;
+        margin-top:-4px;
+        border:8px solid #929497;
+        border-width: 8px 5px 8px;
+        border-color: #929497 transparent transparent transparent;
+        z-index: 2;
+        pointer-events:none;
+    }
+    /* Hover style */
+    .custom-select:hover {
+        border:1px solid #888;
+    }
+    /* Focus style */
+    .custom-select select:focus {
+        outline:none;
+        box-shadow: 0 0 1px 3px rgba(180,222,250, 1);
+        background-color:transparent;
+        color: #222;
+        border:1px solid #aaa;
+    }
+    /* Set options to normal weight */
+    .custom-select option {
+        font-weight:normal;
+    }
+    x:-o-prefocus, .custom-select::after {
+        display:none;
+    }
+    @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+        .custom-select select::-ms-expand {
+            display: none;
+        }
+        .custom-select select:focus::-ms-value {
+            background: transparent;
+            color: #222;
+        }
+    }
+    @-moz-document url-prefix() {
+        .custom-select {
+            overflow: hidden;
+        }
+        .custom-select select {
+            width: 120%;
+            width: -moz-calc(100% + 3em);
+            width: calc(100% + 0em);
+        }
+
+    }
+    .custom-select select:-moz-focusring {
+        color: transparent;
+        text-shadow: 0 0 0 #000;
+    }
+</style>
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12">
+
+            <ol class="breadcrumb">
+                <li><a href="/">学院派－管理后台</a></li>
+                <li class="active">订单管理</li>
+            </ol>
+
+
+            <div class="button custom-select">
+                <select name="" id="filter-status">
+                    <option value="">全部</option>
+                </select>
+            </div>
+
+            <table id="dataTable" class="display table table-bordered">
+                <thead>
+                <tr class="text-center">
+                    <th class="text-center">订单编号</th>
+                    <th class="text-center">老师</th>
+                    <th class="text-center">课程</th>
+                    <th class="text-center">价格</th>
+                    <th class="text-center">订单状态</th>
+                    <th class="text-center">时间</th>
+                    <th class="text-center">教学方式</th>
+                    <th class="text-center">学生</th>
+                    <th class="text-center">结算状态</th>
+                    <th class="text-center">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+            <div id="ctner-pager"></div>
+        </div>
+    </div>
+</div>
+</body>
+<script id="trTemp" type="text/x-jquery-tmpl">
+    <tr>
+        <td>${order_id}</td>
+        <td>${teacher_real_name}</td>
+        <td>${class_name}</td>
+        <td>${class_price}</td>
+        <td>${statusName}</td>
+        <td>
+        ${_time}
+        <br>
+        <span style="font-size: 12px;    white-space: nowrap;">${_title}</span>
+        </td>
+        <td>${teach_type}</td>
+        <td>${student_real_name}</td>
+        <td class="td-settlement">
+         {{if settlement && status==9}}
+            已结算
+          {{/if}}
+          {{if !settlement && status==9}}
+          未结算
+         {{/if}}
+        </td>
+        <td style="text-align: center;">
+         <!--{{if !settlement && status==9}}-->
+                  <!--<a href="javascript:void(0);" class="btn btn-info btn-xs settlement" data-user-id="${order_id}"   >设为已结算</a>-->
+         <!--{{/if}}-->
+            <a href="/order_detail/${order_id}" target="_blank"  class="btn btn-info btn-xs detail" user_id="${order_id}"   >详情</a>
+        </td>
+    </tr>
+
+
+
+</script>
+
+<% include ./script/moment.html  %>
+<% include ./script/pager.html  %>
+<% include ./script/underscore.html  %>
+
+<script>
+    //状态码: 0=未支付, -1=已取消, 2=已支付, 3=已上课, 5=退款中, 7=已退款, 9=已完成
+    var Order = function () {
+        this.statusMap = {
+            "－1": "已取消",
+            "0": "未支付",
+            "2": "已支付",
+            "3": "已上课",
+            "5": "退款中",
+            "7": "已退款",
+            "9": "已完成",
+            "A": "已完成未结算",
+            "B": "已完成已结算",
+        };
+        this.statusMapTime = {
+            "2": "paid_time",//: 已支付时间
+            "3": "consumed_time",//: 已上课时间
+            "5": "refunding_time",//: 退款中时间
+            "7": "refund_time",//: 已退款时间
+            "9": "completed_time",//: 已完成时间
+        };
+        this.statusRecommend = {
+            0: '已推荐',
+            1: '未推荐'
+        };
+        this.btnStatus = {
+            validate: 'validate',//审核
+            recommend: 'recommend',//推荐
+            recommended: 'recommended'//已推荐
+        };
+//        this.$settlement = $('#settlementBtn');
+        this.$filterStatus = $('#filter-status');
+        this.tbody = '#dataTable tbody';
+        this.$trTemp = $('#trTemp');
+        this.page = {from: 0, size: 20};
+        this.opt_ = {ele: '#ctner-pager', last: false};
+        this.init();
+    };
+    Order.prototype.init = function () {
+        var that = this;
+        $(this.tbody).delegate('a.detail', 'click', function () {
+            that.changeStatsu($(this).attr('user_id'), this);
+        });
+//        $(this.tbody).delegate('a.settlement', 'click', function () {
+//            that.settlement($(this).data('user-id'), this);
+//        });
+
+        this.initTable();
+        this.initSelect();
+    };
+    //    Order.prototype.settlement = function (userId, _this) {
+    //        if (confirm('确认已经结算？')) {
+    //            G.request({
+    //                type: 'post',
+    //                url: '/v1/orders/' + userId + '/set_settlement'
+    //            }, function () {
+    //                $(_this).closest('td').siblings('.td-settlement').html('已结算');
+    //                $(_this).remove();
+    //            })
+    //        }
+    //    };
+    Order.prototype.initSelect = function () {
+        var that = this;
+        for (var key in this.statusMap) {
+            that.$filterStatus.append($('<option>').html(that.statusMap[key]).val(key));
+        }
+        ;
+        that.$filterStatus.change(function () {
+//            var true_ =that.$settlement.is(':checked');
+            that.opt_ = $.extend({}, that.opt_, {from: 0, size: 20, status: $(this).val(), last: false});
+            that.initTable({from: 0, size: 20, status: $(this).val(), last: false});
+        });
+//        that.$settlement.change(function(){
+//            var true_ =$(this).is(':checked');
+//            that.opt_ = $.extend({}, that.opt_, {from: 0, size: 20, settlement:true_,status:that.$filterStatus.val(),last: false});
+//            that.initTable({from: 0, size: 20, settlement: true_, last: false,status:that.$filterStatus.val()});
+//        });
+    };
+
+    Order.prototype.renderData = function (data) {
+        var that = this;
+        data = _.map(data, function (ele, index, list) {
+            if (that.statusMapTime[ele.status]) {
+                ele._time = that.statusMap[ele.status] + '时间：';
+                ele._title = moment(ele[that.statusMapTime[ele.status]]).format('YYYY-MM-DD HH:mm:ss');
+            } else {
+                ele._time = '订单创建时间：';
+                ele._title = moment(ele.ctime).format('YYYY-MM-DD HH:mm:ss');
+            }
+            ele.ctime = moment(ele.ctime).format('YYYY-MM-DD HH:mm:ss');
+            ele.statusName = that.statusMap[ele.status];
+            ele.self = JSON.stringify(ele);
+            ele.class_price = G.formatPrice(ele.class_price);
+            ele.settlement = ele.settlement;
+
+            ele.statusRecommended = ele.recommend == 0 ? that.statusRecommend['0'] : that.statusRecommend['1'];
+            return ele;
+        });
+        $(this.tbody).html(this.$trTemp.tmpl(data));
+        that.initPage();
+    };
+
+    //初始化分页
+    Order.prototype.initPage = function () {
+        var that = this;
+        that.opt_ = $.extend({status: that.$filterStatus.val()}, this.page, that.opt_);
+        $.pager(that.opt_, function (data) {
+            that.opt_ = $.extend({}, that.opt_, data);
+            //alert(JSON.stringify(that.opt_))
+            that.initTable(data);
+        });
+
+    };
+
+
+    //获取数据
+    Order.prototype.initTable = function (page) {
+        if (page != undefined && page.status != undefined && page.status == '') {
+            delete  page.status;
+        }
+        var that = this;
+        G.request({
+            url: '/v1/orders/admin_query',
+            data: page || {from: 0, size: 20}
+        }, function (data) {
+            if (data.length < 10) {
+                that.opt_.last = true;
+            } else {
+                that.opt_.last = false;
+            }
+            that.renderData(data);
+        });
+    };
+    Order.prototype.changeStatsu = function (user_id, this_) {
+        var that = this;
+        var opt = {
+            url: '/v1/teachers/set_verified',
+            data: {},
+            type: 'put'
+        };
+//        审核通过
+        if ($(this_).hasClass(that.btnStatus.validate)) {
+            opt.data.user_id = user_id;
+            opt.type = 'post';
+            G.request(opt, function (data) {
+                $(this_).removeClass(that.btnStatus.validate).addClass(that.btnStatus.recommend);
+            });
+            return;
+        }
+//        opt.url = '/v1/teachers/'+user_id+'/recommend';
+////        推荐
+//        if($(this_).hasClass(that.btnStatus.recommend)){
+//            opt.data.recommend = 0;
+//            G.request(opt,function(data){
+//                $(this_).removeClass(that.btnStatus.recommend).addClass(that.btnStatus.recommended);
+//            });
+//        }
+//        //取消推荐
+//        if($(this_).hasClass(that.btnStatus.recommended)){
+//            opt.data.recommend = 1;
+//            G.request(opt,function(data){
+//                $(this_).removeClass(that.btnStatus.recommended).addClass(that.btnStatus.recommend);
+//            });
+//        }
+    };
+
+    $(function () {
+        new Order();
+    });
+</script>

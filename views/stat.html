@@ -1,0 +1,188 @@
+<style>
+    table th {
+        width: 80px;
+        text-align: right;
+    }
+
+    table td {
+        text-align: left;
+        max-width: 300px;
+        min-width: 100px;
+    }
+
+    .url_input {
+        width: 80%;
+
+    }
+
+    .url_p {
+
+    }
+
+    .url_div {
+        border-bottom: 1px solid #111111;
+    }
+</style><br/>
+
+<style type="text/css">
+    #div_id div {
+        float: left;
+        width: 100px;
+        height: 100px;
+        margin: 4px;
+        padding: 4px;
+        border: 1px solid #aaaaaa;
+    }
+</style>
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12">
+
+            <ol class="breadcrumb">
+                <li><a href="/">学院派－管理后台</a></li>
+                <li><a href="/wechat_banner_manager">微信banner管理</a></li>
+
+            </ol>
+
+
+            <textarea rows="10" cols="100" id="ar1"></textarea>
+
+            <br>
+            <input id="upbanners_id" type="button" value="提交" onclick="upbanners()">
+
+            <div id="div_id">
+                <div id="div1" ondrop="drop(event)" ondragover="allowDrop(event)">
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<script id="trTemp" type="text/x-jquery-tmpl">
+<div id="${img_url}_div" ondrop="drop(event)" ondragover="allowDrop(event)">
+        <img src="${img_url}" draggable="true" ondragstart="drag(event)" id="${img_url}_img"  width="90" height="90"/>
+    </div>
+
+</script>
+
+
+<% include ./script/moment.html %>
+<% include ./script/underscore.html %>
+<script>
+    var count = 0;
+    $.ajax({
+        type: "get",
+        url: "/v1/banners",
+        dataType: "json",
+        success: function (data) {
+            console.log(JSON.stringify(data.data))
+            $("#ar1").val(JSON.stringify(data.data));
+
+        }, error: function () {
+            alert("请求出错");
+        }
+    });
+
+    function upbanners() {
+        G.request({
+            type: "post",
+            url: "/v1/banners",
+            data: {
+                banners: JSON.parse($("#ar1").val())
+            },
+            dataType: "json",
+
+            error: function () {
+                alert("请求出错");
+            }
+        }, function (data) {
+            alert("成功！");
+            window.location.href('/wechat_banner_manager');
+        })
+
+    }
+
+</script>
+
+
+<script>
+    //状态码: 0=未支付, -1=已取消, 2=已支付, 3=已上课, 5=退款中, 7=已退款, 9=已完成
+    var Order = function () {
+        this.statusMap = {
+            "－1": "已取消",
+            "0": "未支付",
+            "2": "已支付",
+            "3": "已上课",
+            "5": "退款中",
+            "7": "已退款",
+            "9": "已完成"
+        };
+        this.statusRecommend = {
+            0: '已推荐',
+            1: '未推荐'
+        };
+        this.btnStatus = {
+            validate: 'validate',//审核
+            recommend: 'recommend',//推荐
+            recommended: 'recommended'//已推荐
+        };
+        this.$filterStatus = $('#filter-status');
+        this.tbody = '#div_id';
+        this.$trTemp = $('#trTemp');
+        this.page = {from: 0, size: 20};
+        this.opt_ = {ele: '#ctner-pager', last: false};
+        this.init();
+    };
+    Order.prototype.init = function () {
+        var that = this;
+        this.initTable();
+
+    };
+
+
+    Order.prototype.renderData = function (data) {
+        var that = this;
+//        data = _.map(data,function(ele,index,list){
+//
+//            return ele;
+//        });
+        $(this.tbody).append(this.$trTemp.tmpl(data));
+
+    };
+
+    //初始化分页
+
+
+    //获取数据
+    Order.prototype.initTable = function (page) {
+
+        var that = this;
+        G.request({
+            url: '/v1/banners',
+
+        }, function (data) {
+            that.renderData(data);
+        });
+    };
+
+
+    $(function () {
+        new Order();
+    });
+</script>
+
+<script type="text/javascript">
+    function allowDrop(ev) {
+        ev.preventDefault();
+    }
+
+    function drag(ev) {
+        ev.dataTransfer.setData("Text", ev.target.id);
+    }
+
+    function drop(ev) {
+        ev.preventDefault();
+        var data = ev.dataTransfer.getData("Text");
+        ev.target.appendChild(document.getElementById(data));
+    }
+</script>

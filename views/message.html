@@ -1,0 +1,88 @@
+<br/>
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12">
+
+            <ol class="breadcrumb">
+                <li><a href="/">学院派－管理后台</a></li>
+                <li class="active">通知消息</li>
+            </ol>
+            <style>
+                .input-group {
+                    display: block;
+                }
+            </style>
+            <div class="row">
+
+                <div class="col-xs-12">
+                    <div class="input-group">
+                        <input class="form-control user-id" placeholder="请输入用户ID"/>
+                    </div>
+                </div>
+                <br/>
+
+                <div class="col-xs-12">
+                    <div class="input-group">
+                        <input class="form-control title" placeholder="标题请输入"/>
+                    </div>
+                </div>
+                <br/>
+
+                <div class="col-xs-12">
+                    <div class="input-group">
+                        <textarea name="" id="" cols="30" rows="5" class="form-control"></textarea>
+                    </div>
+                </div>
+                <div class="col-xs-12">
+                    <br/>
+                    <a class="btn btn-danger">
+                        发送
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<% include ./script/moment.html  %>
+<% include ./script/pager.html  %>
+<% include ./script/underscore.html  %>
+
+<script>
+    var Msg = function () {
+        this.$textarea = $('textarea');
+        this.$btnA = $('a.btn');
+        this.$title = $('input.title');
+        this.$userId = $('input.user-id');
+        this.init();
+    };
+
+    Msg.prototype.init = function () {
+        var that = this;
+        that.$btnA.click(function () {
+            var content = that.$textarea.val();
+            var title = that.$title.val();
+            var userId = that.$userId.val();
+            if (content.length == 0 || title.length == 0 || userId.length == 0) {
+                alert('标题或通知内容或者用户ID不能为空！');
+                return false;
+            }
+            G.request({
+                type: 'post',
+                url: '/v1/messages',
+                data: {
+                    type: 'system',
+                    title: title,
+                    content: content,
+                    user_id: userId
+                }
+            }, function (data) {
+                alert('消息发送成功！')
+            })
+        });
+    };
+
+
+    $(function () {
+        new Msg();
+    })
+</script>

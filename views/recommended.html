@@ -1,0 +1,211 @@
+<style>
+    /*tr{border: 2px crimson solid;}*/
+    tr:active {
+        background: lightblue;
+        color: white
+    }
+
+    /*tr:hover{border: 2px greenyellow solid;}*/
+
+    tbody > tr {
+        cursor: move;
+    }
+</style><br/>
+
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12">
+
+            <ol class="breadcrumb">
+                <li><a href="/">学院派－管理后台</a></li>
+                <li class="active">推荐管理</li>
+            </ol>
+
+            <table id="dataTable" class="display table table-bordered">
+                <thead>
+                <tr class="text-center">
+                    <th class="text-center">姓名</th>
+                    <th class="text-center">毕业院校</th>
+                    <th class="text-center">专业</th>
+                    <th class="text-center">概况</th>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+            <p class="masthead-button-links">
+                <a class="btn  btn-primary btn-shadow" href="javascript:void(0);" role="button">保存推荐列表</a>
+            </p>
+            <!--<div id="ctner-pager"></div>-->
+        </div>
+    </div>
+</div>
+<script id="trTemp" type="text/x-jquery-tmpl">
+    <tr data-id="${user_id}" ondragstart="dragStart(event)"  draggable="true"   id="id-${user_id}" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)" ondrop="drop(event)" ondragover="allowDrop(event)"  >
+        <td>${real_name}</td>
+        <td>${graduated}</td>
+        <td class="status">${profession}</td>
+        <td>${summary}</td>
+    </tr>
+
+</script>
+<% include ./script/moment.html  %>
+<% include ./script/pager.html  %>
+<% include ./script/underscore.html  %>
+
+<script>
+
+    function dragStart(event) {
+        event.dataTransfer.setData("Text", event.target.id);
+        event.dataTransfer.setData("Text", event.target.id);
+    }
+
+    function dragEnter(event) {
+        $(event.target).closest('tr')[0].style.backgroundColor = "#e5eecc";
+    }
+
+    function dragLeave(event) {
+        $(event.target).closest('tr')[0].style.backgroundColor = "";
+    }
+
+    function allowDrop(event) {
+        event.preventDefault();
+    }
+
+    function drop(event) {
+        event.preventDefault();
+        $(event.target).closest('tr')[0].style.backgroundColor = "";
+        var data = event.dataTransfer.getData("Text");
+        $(event.target).closest('tr').after($('#' + data));
+    }
+
+
+    var Teacher = function () {
+        this.statusMap = {
+            "0": "未审核",
+            "1": "已审核"
+        };
+        this.statusRecommend = {
+            0: '已推荐',
+            1: '未推荐'
+        };
+        this.btnStatus = {
+            validate: 'validate',//审核
+            unvalidate: 'unvalidate',//推荐
+            recommended: 'recommended'//已推荐
+        };
+        this.tbody = '#dataTable tbody';
+        this.$submit = $('.masthead-button-links a');
+        this.$trTemp = $('#trTemp');
+        this.page = {from: 0, size: 20};
+        this.opt_ = {ele: '#ctner-pager', last: false};
+        this.init();
+    };
+
+    Teacher.prototype.init = function () {
+        var that = this;
+        $(this.tbody).delegate('input[type="button"]', 'click', function () {
+            that.changeStatsu($(this).attr('user_id'), this);
+        });
+        this.initTable();
+        this.$submit.click(function () {
+            var res = [];
+            $(that.tbody).find('tr').each(function (index, val) {
+                res.push({teacher_id: $(this).data('id'), sort: index});
+            });
+//            alert(JSON.stringify(res));
+            G.request({
+                type: 'put',
+                url: '/v1/recommended',
+                data: {
+                    recommendedList: res
+                }
+            }, function () {
+                alert('老师推荐保存完成！');
+            })
+        });
+    };
+
+    Teacher.prototype.renderData = function (data) {
+        var that = this;
+        data = _.map(data, function (ele, index, list) {
+            ele.ctime = moment(ele.ctime).format('YYYY-MM-DD hh:mm:ss');
+            ele.statusName = that.statusMap[ele.status];
+            ele.self = JSON.stringify(ele);
+            ele.recommend = ele.recommended;
+            ele.statusRecommended = ele.recommended == true ? that.statusRecommend['0'] : that.statusRecommend['1'];
+            return ele;
+        });
+        $(this.tbody).html(this.$trTemp.tmpl(data));
+        that.opt_ = $.extend(this.page, that.opt_);
+//        $.pager(that.opt_,function(data){
+//            that.opt_ = $.extend(that.opt_,data);
+//            that.initTable(data);
+//        });
+    };
+
+    Teacher.prototype.initTable = function (page) {
+        var that = this;
+        G.request({
+            url: '/v1/teachers/get_recommended'
+        }, function (data) {
+            if (data.length < 10) {
+                that.opt_.last = true;
+            } else {
+                that.opt_.last = false;
+            }
+            that.renderData(data);
+        });
+    };
+    Teacher.prototype.changeStatsu = function (user_id, this_) {
+        var that = this;
+        var opt = {
+            url: '/v1/teachers/set_verified',
+            data: {
+                user_id: user_id
+            },
+            type: 'post'
+        };
+//        审核通过
+        if ($(this_).hasClass(that.btnStatus.validate)) {
+            opt.data.status = 1;
+        } else if ($(this_).hasClass(that.btnStatus.unvalidate)) {
+            opt.data.status = -1;
+            var tmp = prompt("审核不通过原因:", "");
+            if (tmp.length > 0) {
+                opt.data.status = -1;
+                opt.data.reason = tmp;
+            } else {
+                return;
+            }
+        }
+        G.request(opt, function (data) {
+            alert('发送成功！');
+            $(this_).closest('td').siblings('.status').html(that.statusMap['1']);
+            $(this_).closest('td').siblings('.status').html('已审核');
+            $(this_).siblings('input').remove();
+            $(this_).remove();
+        });
+
+
+//        opt.url = '/v1/teachers/'+user_id+'/recommend';
+////        推荐
+//        if($(this_).hasClass(that.btnStatus.recommend)){
+//            opt.data.recommend = 0;
+//            G.request(opt,function(data){
+//                $(this_).removeClass(that.btnStatus.recommend).addClass(that.btnStatus.recommended);
+//            });
+//        }
+//        //取消推荐
+//        if($(this_).hasClass(that.btnStatus.recommended)){
+//            opt.data.recommend = 1;
+//            G.request(opt,function(data){
+//                $(this_).removeClass(that.btnStatus.recommended).addClass(that.btnStatus.recommend);
+//            });
+//        }
+    };
+
+    $(function () {
+        new Teacher();
+    });
+</script>

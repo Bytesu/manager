@@ -1,0 +1,9 @@
+node_modules
+#public
+.tmp
+.sass-cache
+.idea
+.editorconfig
+#dist
+test
+bower_components

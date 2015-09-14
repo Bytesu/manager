@@ -1,0 +1,83 @@
+<style>
+    .modal-content {
+        border-radius: 3px;
+    }
+</style>
+<!--<input type="submit" id="su" value="备注用户" class="bg s_btn bg-remark" data-toggle="modal" data-target="#myModal">-->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">备注用户</h4>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <!--<label for="message-text" class="control-label">备注内容:</label>-->
+                        <textarea class="form-control" id="message-text"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary " id="input-save">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+
+    (function ($) {
+        $.fn.extend({
+            /**
+             * 输入框
+             * @param opt
+             * @param cb
+             * @returns {*}
+             */
+            modal_: function (opt) {
+                var default_ = {
+                    title: '标题',
+                    cb: function () {
+                    }
+                };
+                default_ = $.extend({}, default_, opt);
+                var Modal = function (val, this_) {
+                    this.$ele = $(this_);
+                    this.$title = this.$ele.find('#exampleModalLabel');
+                    ;
+                    this.init();
+                };
+                Modal.prototype.init = function () {
+                    var that = this;
+                    that.$title.html(default_.title);
+                    that.$ele.on('show.bs.modal', function (event) {
+                    });
+                    that.$ele.on('hide.bs.modal', function (event) {
+                    });
+                    that.$ele.find('.btn-primary').on('click', function () {
+                        var text = that.$ele.find('textarea').val();
+                        if (text.length > 0) {
+                            default_.cb(text);
+
+                            $('#myModal').modal('hide');
+                        } else {
+                            alert('内容不能为空！');
+                        }
+                    });
+                };
+                return this.each(function (idx, val) {
+                    new Modal(val, this);
+                });
+            }
+        });
+    })(jQuery);
+
+    $(function () {
+        // example
+//        $('#myModal').modal_({title:'',cb:function(){}});
+    });
+</script>
