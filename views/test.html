@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+
+</body>
+</html>
+<script>
+
+    jQuery.ajax({
+        url: 'http://localhost:3000',
+        xhrFields: {
+            withCredentials: true
+        },
+        crossDomain: true
+    }, function() {
+        console.log(arguments);
+    });
+
+</script>
